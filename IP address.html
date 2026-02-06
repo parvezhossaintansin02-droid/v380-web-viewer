@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V380 Multi-Camera Web Viewer</title>
+<style>
+  body { background: #111; color: #fff; font-family: Arial, sans-serif; text-align:center; margin:0; padding:0;}
+  h1 { margin: 10px; }
+  .camera-container { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; padding:10px; }
+  video { border:2px solid #fff; border-radius:8px; max-width:300px; max-height:200px; }
+  input, button { padding:8px; margin:5px; border-radius:5px; border:none; }
+  button { background-color:#4CAF50; color:white; cursor:pointer; }
+  .history { margin-top:10px; max-width:90%; text-align:left; margin-left:auto; margin-right:auto;}
+  .history div { background:#222; padding:5px; margin:2px 0; border-radius:5px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<h1>V380 Multi-Camera Web Viewer</h1>
+
+<input type="text" id="streamURL" placeholder="Enter Camera Stream URL (HTTP/HLS)">
+<button onclick="loadStream()">Load Stream</button>
+
+<div class="camera-container" id="cameraContainer">
+  <!-- Video elements will be added here -->
+</div>
+
+<h3>Recent Streams</h3>
+<div class="history" id="historyContainer"></div>
+
+<script>
+let historyList = [];
+
+function loadStream() {
+    const url = document.getElementById('streamURL').value;
+    if(!url) { alert('Enter a valid stream URL'); return; }
+    
+    // Create video element
+    const container = document.getElementById('cameraContainer');
+    const video = document.createElement('video');
+    video.src = url;
+    video.controls = true;
+    video.autoplay = true;
+    video.muted = false;
+    container.appendChild(video);
+
+    // Save to history
+    if(!historyList.includes(url)) {
+        historyList.unshift(url);
+        updateHistory();
+    }
+
+    document.getElementById('streamURL').value = '';
+}
+
+function updateHistory() {
+    const historyDiv = document.getElementById('historyContainer');
+    historyDiv.innerHTML = '';
+    historyList.forEach(url => {
+        const div = document.createElement('div');
+        div.textContent = url;
+        div.onclick = () => {
+            const container = document.getElementById('cameraContainer');
+            const video = document.createElement('video');
+            video.src = url;
+            video.controls = true;
+            video
